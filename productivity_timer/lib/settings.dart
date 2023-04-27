@@ -36,16 +36,16 @@ class _SettingsState extends State<Settings> {
   static const String SHORTBREAK = 'shortbreak';
   static const String LONGBREAK = 'longbreak';
 
-  int workTime = 0;
-  int shortBreak = 0;
-  int longBreak = 0;
+  int? workTime;
+  int? shortBreak;
+  int? longBreak;
 
   @override
   void initState() {
     txtWork = TextEditingController();
     txtShort = TextEditingController();
     txtLong = TextEditingController();
-
+    
     readSettings();
     super.initState();
   }
@@ -69,40 +69,40 @@ class _SettingsState extends State<Settings> {
           Text(''),
           Text(''),
 
-          SettingButton(Color(0xff455A64), '-', -1),
+          SettingButton(Color(0xff455A64),'-', -1,updateSetting, WORKTIME),
           TextField(
             controller: txtWork,
             style: textStyle,
             textAlign: TextAlign.center,
             keyboardType: TextInputType.number,
           ), 
-          SettingButton(Color(0xff009688), '+', 1),
+          SettingButton(Color(0xff009688), '+', 1, updateSetting , WORKTIME),
           
           Text('Short' , style: textStyle,),
           Text(''),
           Text(''),
 
-          SettingButton(Color(0xff455A64), '-', -1),
+          SettingButton(Color(0xff455A64), '-', -1,updateSetting , SHORTBREAK ),
           TextField(
             controller: txtShort,
             style: textStyle,
             textAlign: TextAlign.center,
             keyboardType: TextInputType.number,
           ), 
-          SettingButton(Color(0xff009688), '+', 1),
+          SettingButton(Color(0xff009688), '+', 1, updateSetting , SHORTBREAK),
 
           Text('Long' , style: textStyle,),
           Text(''),
           Text(''),
 
-          SettingButton(Color(0xff455A64), '-', -1),
+          SettingButton(Color(0xff455A64), '-', -1, updateSetting, LONGBREAK),
           TextField(
             controller: txtLong,
             style: textStyle,
             textAlign: TextAlign.center,
             keyboardType: TextInputType.number,
           ), 
-          SettingButton(Color(0xff009688), '+', 1),
+          SettingButton(Color(0xff009688), '+', 1,updateSetting, LONGBREAK),
           
         ],
         
@@ -114,11 +114,25 @@ class _SettingsState extends State<Settings> {
   void readSettings() async{
 
     pref = await SharedPreferences.getInstance();
-    workTime = pref!.getInt(WORKTIME)!;
-    shortBreak = pref!.getInt(SHORTBREAK)!;
-    longBreak = pref!.getInt(LONGBREAK)!;
+   
+    workTime = pref!.getInt(WORKTIME);
+    if (workTime == null){
+      await pref!.setInt(WORKTIME, int.parse('30'));
+      workTime = 30;
+    }
+    shortBreak = pref!.getInt(SHORTBREAK);
+    if (shortBreak == null){
+      await pref!.setInt(SHORTBREAK, int.parse('5'));
+      shortBreak = 5;
+    }
+    longBreak =  pref!.getInt(LONGBREAK);
+    if (longBreak == null){
+      await pref!.setInt(LONGBREAK, int.parse('10'));
+      longBreak = 10;
+    }
 
     setState(() {
+      
       
       txtWork!.text = workTime.toString();
       txtShort!.text = shortBreak.toString();
@@ -127,16 +141,20 @@ class _SettingsState extends State<Settings> {
           });
 
   }
+  void setDefaultValues(){
+
+  }
 
   void updateSetting(String key , int value) async {
 
     switch (key) {
       case WORKTIME:{
         pref = await SharedPreferences.getInstance();
-        workTime = pref!.getInt(WORKTIME)!;
+        int workTime = pref!.getInt(WORKTIME)!;
         workTime += value;
+        
         if (workTime >= 1 && workTime <= 180){
-          pref!.setInt(WORKTIME, workTime);
+          await pref!.setInt(WORKTIME, workTime);
           setState(() {
             txtWork!.text = workTime.toString();
           });
@@ -147,10 +165,10 @@ class _SettingsState extends State<Settings> {
       break;
       case SHORTBREAK:{
         pref = await SharedPreferences.getInstance();
-        shortBreak = pref!.getInt(SHORTBREAK)!;
+        int shortBreak = pref!.getInt(SHORTBREAK)!;
         shortBreak += value;
         if (shortBreak >= 1 && shortBreak <= 120){
-          pref!.setInt(SHORTBREAK, shortBreak);
+          await pref!.setInt(SHORTBREAK, shortBreak);
           setState(() {
             txtShort!.text = shortBreak.toString();
           });
@@ -163,10 +181,10 @@ class _SettingsState extends State<Settings> {
 
       case LONGBREAK:{
         pref = await SharedPreferences.getInstance();
-        longBreak = pref!.getInt(LONGBREAK)!;
+        int longBreak = pref!.getInt(LONGBREAK)!;
         longBreak += value;
         if (longBreak >= 1 && longBreak <= 180){
-          pref!.setInt(LONGBREAK, longBreak);
+          await pref!.setInt(LONGBREAK, longBreak);
           setState(() {
             txtLong!.text = longBreak.toString();
           });

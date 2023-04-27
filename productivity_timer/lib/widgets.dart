@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+typedef CallbackSetting = void Function(String, int);
 
 class ProductivityButton extends StatelessWidget {
   final Color color;
@@ -25,16 +26,19 @@ class SettingButton extends StatelessWidget {
   Color color;
   String text;
   int value;
-  SettingButton(this.color , this.text, this.value);
+  String setting;
+  CallbackSetting callback;
+  SettingButton(this.color , this.text, this.value , this.callback , this.setting);
 
 
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
-      onPressed:(){} ,
+      onPressed:(){ return this.callback(setting , value);} ,
       color: color,
       child: Text(text , 
       style: TextStyle(color: Colors.white),
+
       ),
     
       
